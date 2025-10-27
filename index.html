@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hutara Projects - Matrix Links</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            overflow-x: hidden;
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+            font-family: 'Orbitron', monospace;
+        }
+
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        .matrix-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, 
+                        rgba(0,0,0,0.2) 0%, 
+                        rgba(0,0,0,0.8) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .glitch-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            color: #0aff0a;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            text-shadow: 
+                0 0 10px #0aff0a,
+                0 0 20px #0aff0a,
+                0 0 30px #0aff0a,
+                0 0 40px #0aff0a;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        .glitch-title.h3 {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            color: #fff;
+            opacity: 0.8;
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 1px #0aff0a, 0 0 5px #0aff0a, 0 0 30px #0aff0a; }
+            to { text-shadow: 0 0 25px #0aff0a, 0 0 1px #0aff0a, 0 0 40px #0aff0a; }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #fff;
+            margin-top: 15px;
+            opacity: 0.8;
+            letter-spacing: 0.05em;
+        }
+
+        .social-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .social-card {
+            position: relative;
+            background: rgba(10, 255, 10, 0.03);
+            border: 2px solid rgba(10, 255, 10, 0.2);
+            border-radius: 15px;
+            padding: 12px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .social-card:nth-child(1) { animation-delay: 0.1s; }
+        .social-card:nth-child(2) { animation-delay: 0.2s; }
+        .social-card:nth-child(3) { animation-delay: 0.3s; }
+        .social-card:nth-child(4) { animation-delay: 0.4s; }
+        .social-card:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .social-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(10, 255, 10, 0.3);
+        }
+
+        .social-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(10, 255, 10, 0.2), 
+                transparent);
+            transition: left 0.5s;
+        }
+
+        .social-card:hover::before {
+            left: 100%;
+        }
+
+        .social-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(10, 255, 10, 0.03) 2px,
+                rgba(10, 255, 10, 0.03) 4px
+            );
+            pointer-events: none;
+            animation: scanlines 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .social-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .social-card:hover .social-icon::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .social-info {
+            flex: 1;
+        }
+
+        .social-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 0.05em;
+        }
+
+        .social-username {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Custom Card Styles */
+        .vcv-rack {
+            border-color: rgba(10, 255, 10, 0.3);
+            background: rgba(10, 255, 10, 0.05);
+        }
+        .vcv-rack:hover {
+            border-color: #0aff0a;
+            box-shadow: 0 20px 40px rgba(10, 255, 10, 0.4);
+        }
+        .vcv-rack .social-icon {
+            background: #0aff0a;
+            color: #000;
+        }
+
+        .cybersynth {
+            border-color: rgba(110, 0, 255, 0.3);
+            background: rgba(110, 0, 255, 0.05);
+        }
+        .cybersynth:hover {
+            border-color: #6e00ff;
+            box-shadow: 0 20px 40px rgba(110, 0, 255, 0.4);
+        }
+        .cybersynth .social-icon {
+            background: #6e00ff;
+            color: #fff;
+        }
+
+        .psyber {
+            border-color: rgba(36, 41, 46, 0.3);
+            background: rgba(36, 41, 46, 0.05);
+        }
+        .psyber:hover {
+            border-color: #24292e;
+            box-shadow: 0 20px 40px rgba(36, 41, 46, 0.4);
+        }
+        .psyber .social-icon {
+            background: #24292e;
+            color: #fff;
+        }
+
+        .orca {
+            border-color: rgba(0, 119, 181, 0.3);
+            background: rgba(0, 119, 181, 0.05);
+        }
+        .orca:hover {
+            border-color: #0077b5;
+            box-shadow: 0 20px 40px rgba(0, 119, 181, 0.4);
+        }
+        .orca .social-icon {
+            background: #0077b5;
+            color: #fff;
+        }
+
+        .spotify {
+            border-color: rgba(29, 185, 84, 0.3);
+            background: rgba(29, 185, 84, 0.05);
+        }
+        .spotify:hover {
+            border-color: #1db954;
+            box-shadow: 0 20px 40px rgba(29, 185, 84, 0.4);
+        }
+        .spotify .social-icon {
+            background: #1db954;
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            animation: fadeInUp 1s ease 1s forwards;
+            opacity: 0;
+        }
+
+        .footer-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pulse {
+            display: inline-block;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0aff0a;
+            border-radius: 20px;
+            color: #0aff0a;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.85rem;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(10, 255, 10, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .status:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(10, 255, 10, 0.5);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #0aff0a;
+            border-radius: 50%;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        @media (max-width: 768px) {
+            .social-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+
+            .glitch-title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .status {
+                bottom: 15px;
+                right: 15px;
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
+        }
+
+        @keyframes matrixLoad {
+            0% {
+                transform: translateY(100vh) rotateX(90deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) rotateX(0);
+                opacity: 1;
+            }
+        }
+
+        .social-container {
+            animation: matrixLoad 1s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="matrix-overlay"></div>
+    <div class="status">
+        <span class="status-dot"></span>
+        <span>Links</span>
+    </div>
+    <div class="content-wrapper">
+        <header class="main-header">
+            <h1 class="glitch-title">Hutara</h1>
+
+            <p class="subtitle">Discover innovative music and coding projects</p>
+        </header>
+        <div class="social-container">
+            <a href="https://library.vcvrack.com/Hutara" target="_blank" class="social-card vcv-rack">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">VCV Rack Modules</div>
+                        <div class="social-username">PsyOperator & Random CV</div>
+                    </div>
+                </div>
+            </a>
+            <a href="https://hutara.github.io/CyberSynth/" target="_blank" class="social-card cybersynth">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Strudel CyberSynth</div>
+                        <div class="social-username">Advanced Live Coding Studio</div>
+                    </div>
+                </div>
+            </a>
+            <a href="https://github.com/Remote-Stream/psyber" target="_blank" class="social-card psyber">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Psyber (Fork of Dilber)</div>
+                        <div class="social-username">Audio-Visual Coding Environment</div>
+                    </div>
+                </div>
+            </a>
+            <a href="https://hutara.github.io/Orca/" target="_blank" class="social-card orca">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Orca Hutara</div>
+                        <div class="social-username">Live Coding Music Sequencer</div>
+                    </div>
+                </div>
+            </a>
+            <a href="https://open.spotify.com/artist/7pgFsokJGs8EwXOxXNN6g5" target="_blank" class="social-card spotify">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <i class="fab fa-spotify"></i>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Ayahuasca Album</div>
+                        <div class="social-username">Listen on Spotify</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <footer class="footer">
+            <div class="footer-text">
+                <span>Made with</span>
+                <span class="pulse">💚</span>
+                <span>in The Matrix</span>
+            </div>
+        </footer>
+    </div>
+    <script>
+        const MatrixBackground = (() => {
+            const config = {
+                matrixColor: '#0aff0a',
+                fontSize: 14,
+                columnSpacing: 25,
+                animationSpeed: 45,
+                fadeSpeed: 0.05,
+                glowIntensity: 3,
+                characterSet: 'mixed'
+            };
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            const charSets = {
+                mixed: 'アイウエオカ⛧キクケ⛧コサ⛥シスセソタチツテトナニ⛥ヌネノハヒフヘホマミムメモヤ⸸ユヨラリルレロワψヲン01⸸⛧⛥ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*',
+                binary: '01',
+                katakana: 'アイウ⛧エオカキクケコサシ⛧ス⛥セソタチツテトナニヌネ⛥ノ⸸ハヒフヘホマミムメモヤ⛥ユヨラリルレロワヲン',
+                latin: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+            };
+            const characters = charSets[config.characterSet] || charSets.mixed;
+            const columnWidth = config.fontSize + config.columnSpacing;
+            const columns = Math.floor(width / columnWidth);
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -height / config.fontSize;
+            }
+            const trails = [];
+            for (let i = 0; i < columns; i++) {
+                trails[i] = [];
+            }
+            function draw() {
+                ctx.fillStyle = `rgba(0, 0, 0, ${config.fadeSpeed})`;
+                ctx.fillRect(0, 0, width, height);
+                ctx.font = `${config.fontSize}px monospace`;
+                for (let i = 0; i < drops.length; i++) {
+                    const char = characters[Math.floor(Math.random() * characters.length)];
+                    const x = i * columnWidth;
+                    const y = drops[i] * config.fontSize;
+                    if (trails[i].length > 15) {
+                        trails[i].shift();
+                    }
+                    trails[i].push({ x, y, char });
+                    trails[i].forEach((point, index) => {
+                        const opacity = (index + 1) / trails[i].length;
+                        if (index === trails[i].length - 1) {
+                            ctx.shadowBlur = config.glowIntensity;
+                            ctx.shadowColor = config.matrixColor;
+                            ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                        } else {
+                            ctx.shadowBlur = 0;
+                            const rgb = hexToRgb(config.matrixColor);
+                            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity * 0.6})`;
+                        }
+                        ctx.fillText(point.char, point.x, point.y);
+                    });
+                    ctx.shadowBlur = 0;
+                    drops[i]++;
+                    if (drops[i] * config.fontSize > height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                        trails[i] = [];
+                    }
+                }
+            }
+            function hexToRgb(hex) {
+                const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+                hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : { r: 10, g: 255, b: 10 };
+            }
+            function handleResize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                const newColumns = Math.floor(width / columnWidth);
+                if (newColumns > columns) {
+                    for (let i = columns; i < newColumns; i++) {
+                        drops[i] = Math.random() * -height / config.fontSize;
+                        trails[i] = [];
+                    }
+                } else {
+                    drops.length = newColumns;
+                    trails.length = newColumns;
+                }
+            }
+            return {
+                init: function() {
+                    window.addEventListener('resize', handleResize);
+                    setInterval(draw, config.animationSpeed);
+                },
+                updateConfig: function(newConfig) {
+                    Object.assign(config, newConfig);
+                },
+                getConfig: function() {
+                    return {...config};
+                }
+            };
+        })();
+        MatrixBackground.init();
+        const title = document.querySelector('.glitch-title');
+        const originalText = title.textContent;
+        title.textContent = '';
+        let charIndex = 0;
+        function typeWriter() {
+            if (charIndex < originalText.length) {
+                title.textContent += originalText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        window.addEventListener('load', () => {
+            setTimeout(typeWriter, 500);
+        });
+        const cards = document.querySelectorAll('.social-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+            });
+        });
+        const statusText = document.querySelector('.status span:last-child');
+        const statuses = [
+            'Psyber',
+            'VCV Modules',
+            'CyberSynth',
+            'Orca',
+            'Ayahuasca'
+        ];
+        let statusIndex = 0;
+        setInterval(() => {
+            statusIndex = (statusIndex + 1) % statuses.length;
+            statusText.style.opacity = '0';
+            setTimeout(() => {
+                statusText.textContent = statuses[statusIndex];
+                statusText.style.opacity = '1';
+            }, 300);
+        }, 5000);
+    </script>
+</body>
+</html>
