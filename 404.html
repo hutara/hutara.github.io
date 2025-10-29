@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hutara Projects - Matrix Links</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            overflow-x: hidden;
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+            font-family: 'Orbitron', monospace;
+        }
+
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        .matrix-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, 
+                        rgba(0,0,0,0.2) 0%, 
+                        rgba(0,0,0,0.8) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Music Control Button */
+        .music-control {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 100;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #0aff0a;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(10, 255, 10, 0.3);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 0 30px rgba(10, 255, 10, 0.6);
+            border-color: #00ff00;
+        }
+
+        .music-control::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(10, 255, 10, 0.3), transparent);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .music-control:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Pulse animation for music button */
+        @keyframes musicPulse {
+            0% { box-shadow: 0 0 20px rgba(10, 255, 10, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(10, 255, 10, 0.6), 0 0 50px rgba(10, 255, 10, 0.3); }
+            100% { box-shadow: 0 0 20px rgba(10, 255, 10, 0.3); }
+        }
+
+        .music-control.playing {
+            animation: musicPulse 2s ease-in-out infinite;
+        }
+
+        .music-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .music-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: #0aff0a;
+            transition: all 0.3s ease;
+        }
+
+        .music-control.playing .music-icon svg {
+            fill: #00ff00;
+            filter: drop-shadow(0 0 5px #00ff00);
+        }
+
+        /* Error message for music */
+        .music-error {
+            position: fixed;
+            top: 90px;
+            right: 30px;
+            z-index: 99;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 0.75rem;
+            color: #ff0000;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-error.show {
+            display: block;
+            animation: fadeInOut 3s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Sound Waves Animation */
+        .sound-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        .music-control.playing .sound-waves {
+            display: block;
+        }
+
+        .sound-wave {
+            position: absolute;
+            border: 1px solid #0aff0a;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+        }
+
+        .music-control.playing .sound-wave:nth-child(1) {
+            animation: soundWave 2s infinite;
+        }
+
+        .music-control.playing .sound-wave:nth-child(2) {
+            animation: soundWave 2s infinite 0.5s;
+        }
+
+        .music-control.playing .sound-wave:nth-child(3) {
+            animation: soundWave 2s infinite 1s;
+        }
+
+        @keyframes soundWave {
+            0% {
+                width: 20px;
+                height: 20px;
+                opacity: 1;
+            }
+            100% {
+                width: 60px;
+                height: 60px;
+                opacity: 0;
+            }
+        }
+
+        /* Volume Visualizer */
+        .volume-bars {
+            position: fixed;
+            top: 30px;
+            right: 90px;
+            z-index: 100;
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            height: 50px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .music-control.playing ~ .volume-bars {
+            opacity: 1;
+        }
+
+        .volume-bar {
+            width: 3px;
+            background: linear-gradient(to top, #0aff0a, #00ff00);
+            border-radius: 2px;
+            animation: volumeAnimation 0.5s ease-in-out infinite alternate;
+        }
+
+        .volume-bar:nth-child(1) { animation-delay: 0s; height: 20px; }
+        .volume-bar:nth-child(2) { animation-delay: 0.1s; height: 30px; }
+        .volume-bar:nth-child(3) { animation-delay: 0.2s; height: 25px; }
+        .volume-bar:nth-child(4) { animation-delay: 0.3s; height: 35px; }
+        .volume-bar:nth-child(5) { animation-delay: 0.4s; height: 28px; }
+
+        @keyframes volumeAnimation {
+            0% { transform: scaleY(0.5); }
+            100% { transform: scaleY(1); }
+        }
+
+        /* Music Info Display */
+        .music-info {
+            position: fixed;
+            top: 90px;
+            right: 30px;
+            z-index: 99;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0aff0a;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 0.75rem;
+            color: #0aff0a;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-control.playing ~ .music-info {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .glitch-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            color: #0aff0a;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            text-shadow: 
+                0 0 10px #0aff0a,
+                0 0 20px #0aff0a,
+                0 0 30px #0aff0a,
+                0 0 40px #0aff0a;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 1px #0aff0a, 0 0 5px #0aff0a, 0 0 30px #0aff0a; }
+            to { text-shadow: 0 0 25px #0aff0a, 0 0 1px #0aff0a, 0 0 40px #0aff0a; }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #fff;
+            margin-top: 15px;
+            opacity: 0.8;
+            letter-spacing: 0.05em;
+        }
+
+        .social-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .social-card {
+            position: relative;
+            background: rgba(10, 255, 10, 0.03);
+            border: 2px solid rgba(10, 255, 10, 0.2);
+            border-radius: 15px;
+            padding: 12px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .social-card:nth-child(1) { animation-delay: 0.1s; }
+        .social-card:nth-child(2) { animation-delay: 0.2s; }
+        .social-card:nth-child(3) { animation-delay: 0.3s; }
+        .social-card:nth-child(4) { animation-delay: 0.4s; }
+        .social-card:nth-child(5) { animation-delay: 0.5s; }
+        .social-card:nth-child(6) { animation-delay: 0.6s; }
+        .social-card:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .social-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(10, 255, 10, 0.3);
+        }
+
+        .social-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(10, 255, 10, 0.2), 
+                transparent);
+            transition: left 0.5s;
+        }
+
+        .social-card:hover::before {
+            left: 100%;
+        }
+
+        .social-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(10, 255, 10, 0.03) 2px,
+                rgba(10, 255, 10, 0.03) 4px
+            );
+            pointer-events: none;
+            animation: scanlines 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .social-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .social-card:hover .social-icon::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .social-info {
+            flex: 1;
+        }
+
+        .social-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 0.05em;
+        }
+
+        .social-username {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Custom Card Styles */
+        .vcv-rack, .cyberflow {
+            border-color: rgba(10, 255, 10, 0.3);
+            background: rgba(10, 255, 10, 0.05);
+        }
+        .vcv-rack:hover {
+            border-color: #1ff1ff;
+            box-shadow: 0 20px 40px rgba(10, 255, 10, 0.4);
+        } 
+        
+        .cyberflow:hover {
+            border-color: #0aff0a;
+            box-shadow: 0 20px 40px rgba(10, 255, 10, 0.4);
+        }
+        .vcv-rack .social-icon {
+            background: #d3ffda;
+            color: #000;
+        } 
+        
+        .cyberflow .social-icon {
+            background: #34ff34;
+            color: #000;
+        }
+
+        .shader-matrix {
+            border-color: rgba(255, 0, 128, 0.3);
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.05), rgba(0, 128, 255, 0.05));
+        }
+        .shader-matrix:hover {
+            border-color: #ff0080;
+            box-shadow: 0 20px 40px rgba(255, 0, 128, 0.4);
+        }
+        .shader-matrix .social-icon {
+            background: linear-gradient(135deg, #ff0080, #0080ff);
+            color: #fff;
+        }
+
+        .cybersynth {
+            border-color: rgba(110, 0, 255, 0.3);
+            background: rgba(110, 0, 255, 0.05593);
+        }
+        .cybersynth:hover {
+            border-color: #6e00ff;
+            box-shadow: 0 20px 40px rgba(110, 0, 255, 0.4);
+        }
+        .cybersynth .social-icon {
+            background: #6e00ff;
+            color: #fff;
+        }
+
+        .psyber {
+            border-color: rgba(36, 41, 46, 0.3);
+            background: rgba(36, 41, 46, 0.05);
+        }
+        .psyber:hover {
+            border-color: #24292e;
+            box-shadow: 0 20px 40px rgba(36, 41, 46, 0.4);
+        }
+        .psyber .social-icon {
+            background: #24292e;
+            color: #fff;
+        }
+
+        .orca {
+            border-color: rgba(0, 119, 181, 0.3);
+            background: rgba(0, 119, 181, 0.05);
+        }
+        .orca:hover {
+            border-color: #0077b5;
+            box-shadow: 0 20px 40px rgba(0, 119, 181, 0.4);
+        }
+        .orca .social-icon {
+            background: #0077b5;
+            color: #fff;
+        }
+
+        .spotify {
+            border-color: rgba(29, 185, 84, 0.3);
+            background: rgba(29, 185, 84, 0.05);
+        }
+        .spotify:hover {
+            border-color: #1db954;
+            box-shadow: 0 20px 40px rgba(29, 185, 84, 0.4);
+        }
+        .spotify .social-icon {
+            background: #1db954;
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            animation: fadeInUp 1s ease 1s forwards;
+            opacity: 0;
+        }
+
+        .footer-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pulse {
+            display: inline-block;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0aff0a;
+            border-radius: 20px;
+            color: #0aff0a;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.85rem;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(10, 255, 10, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .status:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(10, 255, 10, 0.5);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #0aff0a;
+            border-radius: 50%;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        @media (max-width: 768px) {
+            .social-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+
+            .glitch-title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .status {
+                bottom: 15px;
+                right: 15px;
+                font-size: 0.75rem;
+                padding: 6px 12px;
+            }
+            
+            .music-control {
+                top: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .volume-bars {
+                display: none;
+            }
+            
+            .music-info {
+                top: 75px;
+                right: 20px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @keyframes matrixLoad {
+            0% {
+                transform: translateY(100vh) rotateX(90deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) rotateX(0);
+                opacity: 1;
+            }
+        }
+
+        .social-container {
+            animation: matrixLoad 1s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Music with multiple sources -->
+    <audio id="backgroundMusic" loop preload="auto">
+        <!-- Online sources -->
+        <!-- <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg"> -->
+        <source src="./music/HUTARA-FLYING DREAM.mp3" type="audio/mpeg"> 
+        <!-- Local fallback -->
+        
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Music Error Message -->
+    <div class="music-error" id="musicError">
+        ⚠ Music load failed
+    </div>
+
+    <!-- Music Control Button -->
+    <button class="music-control" id="musicToggle">
+        <div class="sound-waves">
+            <div class="sound-wave"></div>
+            <div class="sound-wave"></div>
+            <div class="sound-wave"></div>
+        </div>
+        <div class="music-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path id="playIcon" d="M8 5v14l11-7z" style="display: block;"/>
+                <path id="pauseIcon" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" style="display: none;"/>
+            </svg>
+        </div>
+    </button>
+
+    <!-- Volume Bars Visualizer -->
+    <div class="volume-bars">
+        <div class="volume-bar"></div>
+        <div class="volume-bar"></div>
+        <div class="volume-bar"></div>
+        <div class="volume-bar"></div>
+        <div class="volume-bar"></div>
+    </div>
+
+    <!-- Music Info -->
+    <div class="music-info">
+        <span>♪ Cyber Ambient</span>
+    </div>
+
+    <canvas id="matrix-bg"></canvas>
+    <div class="matrix-overlay"></div>
+    <div class="status">
+        <span class="status-dot"></span>
+        <span>Links</span>
+    </div>
+    
+    <div class="content-wrapper">
+        <header class="main-header">
+            <h1 class="glitch-title">Hutara</h1>
+            <p class="subtitle">Discover innovative music and coding projects</p>
+        </header>
+        <div class="social-container">
+            <!-- VCV Rack Card -->
+            <a href="https://library.vcvrack.com/Hutara" target="_blank" class="social-card vcv-rack">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Modular Synth Rack -->
+                            <rect x="10" y="10" width="60" height="60" rx="5" fill="none" stroke="#000" stroke-width="2" opacity="0.3"/>
+                            
+                            <!-- Patch Points -->
+                            <circle cx="25" cy="25" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="55" cy="25" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="25" cy="55" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="55" cy="55" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            
+                            <!-- Patch Cables -->
+                            <path d="M29 25 Q40 15, 51 25" stroke="#000" stroke-width="2" fill="none" opacity="0.8">
+                                <animate attributeName="d" values="M29 25 Q40 15, 51 25;M29 25 Q40 35, 51 25;M29 25 Q40 15, 51 25" dur="3s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M25 29 Q15 40, 25 51" stroke="#000" stroke-width="2" fill="none" opacity="0.8">
+                                <animate attributeName="d" values="M25 29 Q15 40, 25 51;M25 29 Q35 40, 25 51;M25 29 Q15 40, 25 51" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+                            </path>
+                            
+                            <!-- Center Knob -->
+                            <circle cx="40" cy="40" r="8" fill="none" stroke="#000" stroke-width="2" opacity="0.7"/>
+                            <line x1="40" y1="40" x2="40" y2="32" stroke="#000" stroke-width="2" opacity="0.9">
+                                <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="4s" repeatCount="indefinite"/>
+                            </line>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">VCV Rack Modules</div>
+                        <div class="social-username">PsyOperator & Random CV</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- CyberFlow Card -->
+            <a href="https://hutara.github.io/CyberFlow/" target="_blank" class="social-card cyberflow">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Neural Network -->
+                            <g opacity="0.9">
+                                <!-- Input Layer -->
+                                <circle cx="20" cy="20" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="20" cy="40" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="20" cy="60" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.4s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Hidden Layer -->
+                                <circle cx="40" cy="25" r="4" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="40" cy="40" r="4" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.8s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="40" cy="55" r="4" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Output Layer -->
+                                <circle cx="60" cy="30" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1.2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="60" cy="50" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1.4s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Connections -->
+                                <path d="M23 20 L37 25 M23 20 L37 40 M23 20 L37 55" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M23 40 L37 25 M23 40 L37 40 M23 40 L37 55" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M23 60 L37 25 M23 60 L37 40 M23 60 L37 55" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="1s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M43 25 L57 30 M43 25 L57 50" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M43 40 L57 30 M43 40 L57 50" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="2s" repeatCount="indefinite"/>
+                                </path>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">CyberFlow</div>
+                        <div class="social-username">Neural Music Generator</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Shader Matrix Card - NEW -->
+            <a href="https://hutara.github.io/ShaderMatrix/" target="_blank" class="social-card shader-matrix">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Fragment Shader Visualization -->
+                            <defs>
+                                <linearGradient id="shaderGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#ff0080;#00ff80;#0080ff;#ff0080" dur="4s" repeatCount="indefinite"/>
+                                    </stop>
+                                    <stop offset="100%" style="stop-color:#0080ff;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#0080ff;#ff0080;#00ff80;#0080ff" dur="4s" repeatCount="indefinite"/>
+                                    </stop>
+                                </linearGradient>
+                                <linearGradient id="shaderGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#00ff80;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#00ff80;#0080ff;#ff0080;#00ff80" dur="3s" repeatCount="indefinite"/>
+                                    </stop>
+                                    <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#ff00ff;#00ffff;#ffff00;#ff00ff" dur="3s" repeatCount="indefinite"/>
+                                    </stop>
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Pixel Grid -->
+                            <g opacity="0.3">
+                                <rect x="15" y="15" width="50" height="50" fill="none" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="25" x2="65" y2="25" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="35" x2="65" y2="35" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="45" x2="65" y2="45" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="55" x2="65" y2="55" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="25" y1="15" x2="25" y2="65" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="35" y1="15" x2="35" y2="65" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="45" y1="15" x2="45" y2="65" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="55" y1="15" x2="55" y2="65" stroke="#fff" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- Animated Triangles (Fragment Shader Effect) -->
+                            <polygon points="40,20 25,45 55,45" fill="url(#shaderGrad1)" opacity="0.7">
+                                <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="8s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+                            </polygon>
+                            
+                            <polygon points="40,60 25,35 55,35" fill="url(#shaderGrad2)" opacity="0.5">
+                                <animateTransform attributeName="transform" type="rotate" from="360 40 40" to="0 40 40" dur="6s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </polygon>
+                            
+                            <!-- UV Coordinates Display -->
+                            <text x="17" y="23" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">0,0</text>
+                            <text x="53" y="23" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">1,0</text>
+                            <text x="17" y="63" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">0,1</text>
+                            <text x="53" y="63" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">1,1</text>
+                            
+                            <!-- Center Point (Fragment) -->
+                            <circle cx="40" cy="40" r="2" fill="#fff">
+                                <animate attributeName="r" values="2;4;2" dur="1.5s" repeatCount="indefinite"/>
+                                <animate attributeName="fill" values="#fff;#ff0080;#0080ff;#fff" dur="3s" repeatCount="indefinite"/>
+                            </circle>
+                            
+                            <!-- Raymarching Effect Lines -->
+                            <line x1="40" y1="40" x2="65" y2="15" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="40" y1="40" x2="15" y2="15" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="40" y1="40" x2="15" y2="65" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="40" y1="40" x2="65" y2="65" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+                            </line>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Shader Matrix</div>
+                        <div class="social-username">WebGL Shader Editor</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- CyberSynth Card -->            
+            <a href="https://hutara.github.io/CyberSynth/" target="_blank" class="social-card cybersynth">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Waveform Visualization -->
+                            <g opacity="0.9">
+                                <path d="M10 40 Q20 20, 30 40 T50 40 Q60 60, 70 40" 
+                                      stroke="#fff" stroke-width="2" fill="none">
+                                    <animate attributeName="d" 
+                                             values="M10 40 Q20 20, 30 40 T50 40 Q60 60, 70 40;
+                                                     M10 40 Q20 60, 30 40 T50 40 Q60 20, 70 40;
+                                                     M10 40 Q20 20, 30 40 T50 40 Q60 60, 70 40" 
+                                             dur="2s" repeatCount="indefinite"/>
+                                </path>
+                                
+                                <!-- Frequency Bars -->
+                                <rect x="15" y="35" width="3" height="10" fill="#fff">
+                                    <animate attributeName="height" values="10;25;10" dur="0.5s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="35;27.5;35" dur="0.5s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="25" y="30" width="3" height="20" fill="#fff">
+                                    <animate attributeName="height" values="20;35;20" dur="0.5s" begin="0.1s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="30;22.5;30" dur="0.5s" begin="0.1s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="35" y="32" width="3" height="16" fill="#fff">
+                                    <animate attributeName="height" values="16;30;16" dur="0.5s" begin="0.2s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="32;25;32" dur="0.5s" begin="0.2s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="45" y="28" width="3" height="24" fill="#fff">
+                                    <animate attributeName="height" values="24;40;24" dur="0.5s" begin="0.3s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="28;20;28" dur="0.5s" begin="0.3s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="55" y="33" width="3" height="14" fill="#fff">
+                                    <animate attributeName="height" values="14;28;14" dur="0.5s" begin="0.4s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="33;26;33" dur="0.5s" begin="0.4s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="65" y="36" width="3" height="8" fill="#fff">
+                                    <animate attributeName="height" values="8;20;8" dur="0.5s" begin="0.5s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="36;30;36" dur="0.5s" begin="0.5s" repeatCount="indefinite"/>
+                                </rect>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Strudel CyberSynth</div>
+                        <div class="social-username">Advanced Live Coding Studio</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Psyber Card -->
+            <a href="https://github.com/Remote-Stream/psyber" target="_blank" class="social-card psyber">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Code Terminal -->
+                            <rect x="10" y="15" width="60" height="50" rx="3" fill="none" stroke="#fff" stroke-width="2" opacity="0.7"/>
+                            
+                            <!-- Terminal Header -->
+                            <circle cx="18" cy="23" r="2" fill="#ff6666" opacity="0.9"/>
+                            <circle cx="26" cy="23" r="2" fill="#ffff66" opacity="0.9"/>
+                            <circle cx="34" cy="23" r="2" fill="#66ff66" opacity="0.9"/>
+                            
+                            <!-- Code Lines -->
+                            <text x="15" y="38" font-family="monospace" font-size="8" fill="#fff" opacity="0.9">
+                                <tspan>></tspan>
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                            </text>
+                            <rect x="25" y="33" width="30" height="1" fill="#fff" opacity="0.7">
+                                <animate attributeName="width" values="0;30;0" dur="2s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect x="15" y="43" width="20" height="1" fill="#fff" opacity="0.5">
+                                <animate attributeName="width" values="0;20;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect x="38" y="43" width="15" height="1" fill="#fff" opacity="0.5">
+                                <animate attributeName="width" values="0;15;0" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect x="15" y="53" width="40" height="1" fill="#fff" opacity="0.6">
+                                <animate attributeName="width" values="0;40;0" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </rect>
+                            
+                            <!-- Cursor -->
+                            <rect x="56" y="32" width="2" height="8" fill="#fff">
+                                <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+                            </rect>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Psyber (Fork of Dilber)</div>
+                        <div class="social-username">Audio-Visual Coding Environment</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Orca Card -->
+            <a href="https://hutara.github.io/Orca/" target="_blank" class="social-card orca">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Grid Pattern -->
+                            <g opacity="0.3">
+                                <line x1="20" y1="10" x2="20" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="30" y1="10" x2="30" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="40" y1="10" x2="40" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="50" y1="10" x2="50" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="60" y1="10" x2="60" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="20" x2="70" y2="20" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="30" x2="70" y2="30" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="40" x2="70" y2="40" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="50" x2="70" y2="50" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="60" x2="70" y2="60" stroke="#fff" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- Orca Characters -->
+                            <text x="20" y="27" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                D
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="30" y="37" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                8
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="40" y="27" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                T
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="50" y="47" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                C
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.6s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="30" y="57" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                *
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.8s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="50" y="37" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                :
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="1s" repeatCount="indefinite"/>
+                            </text>
+                            
+                            <!-- Moving Cursor -->
+                            <rect x="18" y="22" width="14" height="12" fill="none" stroke="#fff" stroke-width="2" opacity="0.8">
+                                <animate attributeName="x" values="18;28;38;48;38;28;18" dur="3s" repeatCount="indefinite"/>
+                                <animate attributeName="y" values="22;32;22;42;52;32;22" dur="3s" repeatCount="indefinite"/>
+                            </rect>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Orca Hutara</div>
+                        <div class="social-username">Live Coding Music Sequencer</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Spotify Card -->
+            <a href="https://open.spotify.com/artist/7pgFsokJGs8EwXOxXNN6g5" target="_blank" class="social-card spotify">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Spotify Wave -->
+                            <circle cx="40" cy="40" r="30" fill="none" stroke="#fff" stroke-width="2" opacity="0.3"/>
+                            
+                            <!-- Sound Waves -->
+                            <path d="M25 35 Q40 30, 55 35" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none">
+                                <animate attributeName="d" values="M25 35 Q40 30, 55 35;M25 35 Q40 40, 55 35;M25 35 Q40 30, 55 35" dur="1.5s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M28 42 Q40 38, 52 42" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none">
+                                <animate attributeName="d" values="M28 42 Q40 38, 52 42;M28 42 Q40 46, 52 42;M28 42 Q40 38, 52 42" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M31 49 Q40 46, 49 49" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none">
+                                <animate attributeName="d" values="M31 49 Q40 46, 49 49;M31 49 Q40 52, 49 49;M31 49 Q40 46, 49 49" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+                            </path>
+                            
+                            <!-- Pulse Effect -->
+                            <circle cx="40" cy="40" r="25" fill="none" stroke="#fff" stroke-width="1" opacity="0">
+                                <animate attributeName="r" values="25;35;25" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0;0.5;0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Ayahuasca Album</div>
+                        <div class="social-username">Listen on Spotify</div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+        <footer class="footer">
+            <div class="footer-text">
+                <span>Made with</span>
+                <span class="pulse">💚</span>
+                <span>in The Matrix</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Music Control with Error Handling
+        const musicToggle = document.getElementById('musicToggle');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const musicError = document.getElementById('musicError');
+        let isPlaying = false;
+        let fadeInterval;
+        let hasUserInteracted = false;
+
+        // Set initial volume
+        backgroundMusic.volume = 0.3;
+
+        // Error handling for audio
+        backgroundMusic.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            musicError.classList.add('show');
+            setTimeout(() => {
+                musicError.classList.remove('show');
+            }, 3000);
+        });
+
+        backgroundMusic.addEventListener('loadeddata', () => {
+            console.log('Audio loaded successfully');
+        });
+
+        // Fade In Function
+        function fadeIn() {
+            clearInterval(fadeInterval);
+            let volume = 0;
+            backgroundMusic.volume = 0;
+            
+            backgroundMusic.play().then(() => {
+                console.log('Music started playing');
+                fadeInterval = setInterval(() => {
+                    if (volume < 0.3) {
+                        volume += 0.01;
+                        backgroundMusic.volume = Math.min(volume, 0.3);
+                    } else {
+                        clearInterval(fadeInterval);
+                    }
+                }, 30);
+            }).catch((error) => {
+                console.error('Play failed:', error);
+                // Show error message
+                musicError.classList.add('show');
+                setTimeout(() => {
+                    musicError.classList.remove('show');
+                }, 3000);
+                
+                // Reset button state
+                musicToggle.classList.remove('playing');
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                isPlaying = false;
+            });
+        }
+
+        // Fade Out Function
+        function fadeOut() {
+            clearInterval(fadeInterval);
+            let volume = backgroundMusic.volume;
+            
+            fadeInterval = setInterval(() => {
+                if (volume > 0) {
+                    volume -= 0.01;
+                    backgroundMusic.volume = Math.max(volume, 0);
+                } else {
+                    clearInterval(fadeInterval);
+                    backgroundMusic.pause();
+                    console.log('Music paused');
+                }
+            }, 30);
+        }
+
+        // Toggle Music
+        musicToggle.addEventListener('click', () => {
+            hasUserInteracted = true;
+            
+            if (isPlaying) {
+                fadeOut();
+                musicToggle.classList.remove('playing');
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            } else {
+                fadeIn();
+                musicToggle.classList.add('playing');
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Try to autoplay when page is ready (may be blocked by browser)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add click listener for first user interaction
+            document.addEventListener('click', function firstInteraction() {
+                if (!hasUserInteracted) {
+                    hasUserInteracted = true;
+                    if (!isPlaying) {
+                        fadeIn();
+                        musicToggle.classList.add('playing');
+                        playIcon.style.display = 'none';
+                        pauseIcon.style.display = 'block';
+                        isPlaying = true;
+                    }
+                    document.removeEventListener('click', firstInteraction);
+                }
+            }, { once: true });
+        });
+
+        // Matrix Background
+        const MatrixBackground = (() => {
+            const config = {
+                matrixColor: '#0aff0a',
+                fontSize: 14,
+                columnSpacing: 25,
+                animationSpeed: 45,
+                fadeSpeed: 0.05,
+                glowIntensity: 3,
+                characterSet: 'mixed'
+            };
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            const charSets = {
+                mixed: 'アイウエオカ⛧キクケ⛧コサ⛥シスセソタチツテトナニ⛥ヌネノハヒフヘホマミムメモヤ⸸ユヨラリルレロワψヲン01⸸⛧⛥ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*',
+                binary: '01',
+                katakana: 'アイウ⛧エオカキクケコサシ⛧ス⛥セソタチツテトナニヌネ⛥ノ⸸ハヒフヘホマミムメモヤ⛥ユヨラリルレロワヲン',
+                latin: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+            };
+            const characters = charSets[config.characterSet] || charSets.mixed;
+            const columnWidth = config.fontSize + config.columnSpacing;
+            const columns = Math.floor(width / columnWidth);
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -height / config.fontSize;
+            }
+            const trails = [];
+            for (let i = 0; i < columns; i++) {
+                trails[i] = [];
+            }
+            function draw() {
+                ctx.fillStyle = `rgba(0, 0, 0, ${config.fadeSpeed})`;
+                ctx.fillRect(0, 0, width, height);
+                ctx.font = `${config.fontSize}px monospace`;
+                for (let i = 0; i < drops.length; i++) {
+                    const char = characters[Math.floor(Math.random() * characters.length)];
+                    const x = i * columnWidth;
+                    const y = drops[i] * config.fontSize;
+                    if (trails[i].length > 15) {
+                        trails[i].shift();
+                    }
+                    trails[i].push({ x, y, char });
+                    trails[i].forEach((point, index) => {
+                        const opacity = (index + 1) / trails[i].length;
+                        if (index === trails[i].length - 1) {
+                            ctx.shadowBlur = config.glowIntensity;
+                            ctx.shadowColor = config.matrixColor;
+                            ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                        } else {
+                            ctx.shadowBlur = 0;
+                            const rgb = hexToRgb(config.matrixColor);
+                            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity * 0.6})`;
+                        }
+                        ctx.fillText(point.char, point.x, point.y);
+                    });
+                    ctx.shadowBlur = 0;
+                    drops[i]++;
+                    if (drops[i] * config.fontSize > height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                        trails[i] = [];
+                    }
+                }
+            }
+            function hexToRgb(hex) {
+                const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+                hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : { r: 10, g: 255, b: 10 };
+            }
+            function handleResize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                const newColumns = Math.floor(width / columnWidth);
+                if (newColumns > columns) {
+                    for (let i = columns; i < newColumns; i++) {
+                        drops[i] = Math.random() * -height / config.fontSize;
+                        trails[i] = [];
+                    }
+                } else {
+                    drops.length = newColumns;
+                    trails.length = newColumns;
+                }
+            }
+            return {
+                init: function() {
+                    window.addEventListener('resize', handleResize);
+                    setInterval(draw, config.animationSpeed);
+                },
+                updateConfig: function(newConfig) {
+                    Object.assign(config, newConfig);
+                },
+                getConfig: function() {
+                    return {...config};
+                }
+            };
+        })();
+        MatrixBackground.init();
+        
+        const title = document.querySelector('.glitch-title');
+        const originalText = title.textContent;
+        title.textContent = '';
+        let charIndex = 0;
+        function typeWriter() {
+            if (charIndex < originalText.length) {
+                title.textContent += originalText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        window.addEventListener('load', () => {
+            setTimeout(typeWriter, 500);
+        });
+        
+        const cards = document.querySelectorAll('.social-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+            });
+        });
+        
+        const statusText = document.querySelector('.status span:last-child');
+        const statuses = [
+            'Psyber',
+            'VCV Modules',
+            'CyberSynth',
+            'Shader Matrix',
+            'Orca',
+            'Ayahuasca',
+            'CyberFlow'
+        ];
+        let statusIndex = 0;
+        setInterval(() => {
+            statusIndex = (statusIndex + 1) % statuses.length;
+            statusText.style.opacity = '0';
+            setTimeout(() => {
+                statusText.textContent = statuses[statusIndex];
+                statusText.style.opacity = '1';
+            }, 300);
+        }, 5000);
+    </script>
+</body>
+</html>
