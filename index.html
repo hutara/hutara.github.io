@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hutara Projects - Matrix Links</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap">
     <style>
         * {
@@ -15,32 +14,180 @@
 
         body {
             background: #000000;
-            overflow-x: hidden;
+            overflow: hidden;
             width: 100vw;
             min-height: 100vh;
             position: relative;
             font-family: 'Orbitron', monospace;
         }
 
+        /* === INTRO OVERLAY === */
+        #intro-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 1.5s ease-out;
+            pointer-events: none;
+        }
+
+        #intro-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .intro-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 900;
+            color: #0aff0a;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 
+                0 0 10px #0aff0a,
+                0 0 20px #0aff0a,
+                0 0 40px #0aff0a,
+                0 0 80px #0aff0a;
+            animation: glitchIntro 3s infinite, pulseGlow 2s ease-in-out infinite alternate;
+            position: relative;
+        }
+
+        .intro-title::before,
+        .intro-title::after {
+            content: 'HUTARA';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            color: #0aff0a;
+            opacity: 0.8;
+        }
+
+        .intro-title::before {
+            animation: glitch1 0.5s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            transform: translate(-2px, -2px);
+        }
+
+        .intro-title::after {
+            animation: glitch2 0.5s infinite;
+            clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+            transform: translate(2px, 2px);
+        }
+
+        @keyframes glitchIntro {
+            0%, 100% { text-shadow: 0 0 10px #0aff0a, 0 0 20px #0aff0a; }
+            10% { text-shadow: 3px 0 #ff00ff, -3px 0 #00ffff; }
+            20% { text-shadow: -3px 0 #ffff00, 3px 0 #ff00ff; }
+            30% { text-shadow: 0 0 40px #0aff0a, 0 0 80px #0aff0a; }
+        }
+
+        @keyframes glitch1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-5px, -5px); }
+            40% { transform: translate(5px, 5px); }
+            60% { transform: translate(-3px, 3px); }
+        }
+
+        @keyframes glitch2 {
+            0%, 100% { transform: translate(0); }
+            30% { transform: translate(4px, -4px); }
+            70% { transform: translate(-4px, 4px); }
+        }
+
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 20px #0aff0a, 0 0 40px #0aff0a; }
+            to { text-shadow: 0 0 40px #0aff0a, 0 0 80px #0aff0a, 0 0 120px #0aff0a; }
+        }
+
+        .intro-subtitle {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #0aff0a;
+            letter-spacing: 0.1em;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.5s forwards;
+        }
+
+        /* Intro Matrix Rain */
+        #intro-matrix {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Scanlines */
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(20px); }
+        }
+
+        /* Loading Bar */
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(10, 255, 10, 0.2);
+            margin-top: 40px;
+            border-radius: 2px;
+            overflow: hidden;
+            opacity: 0.2;
+            animation: fadeIn 1.5s ease 2s forwards;
+        }
+
+        .loading-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0aff0a, #00ff00);
+            box-shadow: 0 0 10px #0aff0a;
+            animation: load 3s ease forwards;
+        }
+
+        @keyframes load {
+            to { width: 99%; }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 0.4; }
+        }
+
+        /* === MAIN CONTENT === */
         #matrix-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 1;
             opacity: 0.4;
         }
 
         .matrix-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: radial-gradient(ellipse at center, 
                         rgba(0,0,0,0.2) 0%, 
-                        rgba(0,0,0,0.8) 100%);
+                        rgba(0, 0, 0, 0.507) 100%);
             z-index: 2;
             pointer-events: none;
         }
@@ -55,12 +202,17 @@
             align-items: center;
             justify-content: center;
             padding: 40px 20px;
+            opacity: 0;
+            animation: fadeInContent 1.5s ease 3.5s forwards;
+        }
+
+        @keyframes fadeInContent {
+            to { opacity: 1; }
         }
 
         .main-header {
             text-align: center;
             margin-bottom: 60px;
-            animation: fadeInDown 1s ease;
         }
 
         .glitch-title {
@@ -77,13 +229,6 @@
                 0 0 30px #0aff0a,
                 0 0 40px #0aff0a;
             animation: textGlow 2s ease-in-out infinite alternate;
-        }
-
-        .glitch-title.h3 {
-            font-size: 1.5rem;
-            margin-top: 10px;
-            color: #fff;
-            opacity: 0.8;
         }
 
         @keyframes textGlow {
@@ -108,6 +253,7 @@
             padding: 0 20px;
         }
 
+        /* === CARD GLITCH ANIMATION === */
         .social-card {
             position: relative;
             background: rgba(10, 255, 10, 0.03);
@@ -118,35 +264,41 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
             backdrop-filter: blur(10px);
-            animation: fadeInUp 0.8s ease forwards;
             opacity: 0;
+            animation: glitchCard 0.8s ease forwards;
         }
 
-        .social-card:nth-child(1) { animation-delay: 0.1s; }
-        .social-card:nth-child(2) { animation-delay: 0.2s; }
-        .social-card:nth-child(3) { animation-delay: 0.3s; }
-        .social-card:nth-child(4) { animation-delay: 0.4s; }
-        .social-card:nth-child(5) { animation-delay: 0.5s; }
+        .social-card:nth-child(1) { animation-delay: 3.8s; }
+        .social-card:nth-child(2) { animation-delay: 3.9s; }
+        .social-card:nth-child(3) { animation-delay: 4.0s; }
+        .social-card:nth-child(4) { animation-delay: 4.1s; }
+        .social-card:nth-child(5) { animation-delay: 4.2s; }
+        .social-card:nth-child(6) { animation-delay: 4.3s; }
+        .social-card:nth-child(7) { animation-delay: 4.4s; }
 
-        @keyframes fadeInUp {
-            from {
+        @keyframes glitchCard {
+            0% {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(50px) scale(0.9);
+                clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
             }
-            to {
+            10% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+                transform: translateY(0) scale(1.02);
+            }
+            15% {
+                transform: translateX(-5px);
+            }
+            20% {
+                transform: translateX(5px);
+            }
+            25% {
+                transform: translateX(-3px);
+            }
+            100% {
                 opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
             }
         }
 
@@ -217,6 +369,11 @@
             overflow: hidden;
         }
 
+        .social-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
         .social-icon::before {
             content: '';
             position: absolute;
@@ -254,22 +411,45 @@
         }
 
         /* Custom Card Styles */
-        .vcv-rack {
+        .vcv-rack, .cyberflow {
             border-color: rgba(10, 255, 10, 0.3);
             background: rgba(10, 255, 10, 0.05);
         }
         .vcv-rack:hover {
+            border-color: #1ff1ff;
+            box-shadow: 0 20px 40px rgba(10, 255, 10, 0.4);
+        } 
+        
+        .cyberflow:hover {
             border-color: #0aff0a;
             box-shadow: 0 20px 40px rgba(10, 255, 10, 0.4);
         }
         .vcv-rack .social-icon {
-            background: #0aff0a;
+            background: #d3ffda;
             color: #000;
+        } 
+        
+        .cyberflow .social-icon {
+            background: #34ff34;
+            color: #000;
+        }
+
+        .shader-matrix {
+            border-color: rgba(255, 0, 128, 0.3);
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.05), rgba(0, 128, 255, 0.05));
+        }
+        .shader-matrix:hover {
+            border-color: #ff0080;
+            box-shadow: 0 20px 40px rgba(255, 0, 128, 0.4);
+        }
+        .shader-matrix .social-icon {
+            background: linear-gradient(135deg, #ff0080, #0080ff);
+            color: #fff;
         }
 
         .cybersynth {
             border-color: rgba(110, 0, 255, 0.3);
-            background: rgba(110, 0, 255, 0.05);
+            background: rgba(110, 0, 255, 0.05593);
         }
         .cybersynth:hover {
             border-color: #6e00ff;
@@ -324,8 +504,8 @@
             text-align: center;
             color: rgba(255, 255, 255, 0.5);
             font-size: 0.9rem;
-            animation: fadeInUp 1s ease 1s forwards;
             opacity: 0;
+            animation: fadeInUp 1s ease 4.5s forwards;
         }
 
         .footer-text {
@@ -363,6 +543,8 @@
             backdrop-filter: blur(8px);
             box-shadow: 0 0 15px rgba(10, 255, 10, 0.3);
             transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 1s ease 4.6s forwards;
         }
 
         .status:hover {
@@ -404,41 +586,65 @@
                 padding: 6px 12px;
             }
         }
-
-        @keyframes matrixLoad {
-            0% {
-                transform: translateY(100vh) rotateX(90deg);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0) rotateX(0);
-                opacity: 1;
-            }
-        }
-
-        .social-container {
-            animation: matrixLoad 1s ease forwards;
-        }
     </style>
 </head>
 <body>
+
+    <!-- INTRO OVERLAY -->
+    <div id="intro-overlay">
+        <canvas id="intro-matrix"></canvas>
+        <div class="scanlines"></div>
+
+        <div class="intro-subtitle">Initializing Neural Matrix...</div>
+        <div class="loading-bar">
+            <div class="loading-fill"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
     <canvas id="matrix-bg"></canvas>
     <div class="matrix-overlay"></div>
     <div class="status">
         <span class="status-dot"></span>
         <span>Links</span>
     </div>
+    
     <div class="content-wrapper">
         <header class="main-header">
             <h1 class="glitch-title">Hutara</h1>
-
             <p class="subtitle">Discover innovative music and coding projects</p>
         </header>
         <div class="social-container">
+            <!-- کارت‌های شما (همان قبلی) -->
+            <!-- VCV Rack Card -->
             <a href="https://library.vcvrack.com/Hutara" target="_blank" class="social-card vcv-rack">
                 <div class="card-content">
                     <div class="social-icon">
-                        <i class="fas fa-music"></i>
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="10" width="60" height="60" rx="5" fill="none" stroke="#000" stroke-width="2" opacity="0.3"/>
+                            <circle cx="25" cy="25" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="55" cy="25" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="25" cy="55" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="55" cy="55" r="4" fill="#000" opacity="0.9">
+                                <animate attributeName="r" values="4;6;4" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <path d="M29 25 Q40 15, 51 25" stroke="#000" stroke-width="2" fill="none" opacity="0.8">
+                                <animate attributeName="d" values="M29 25 Q40 15, 51 25;M29 25 Q40 35, 51 25;M29 25 Q40 15, 51 25" dur="3s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M25 29 Q15 40, 25 51" stroke="#000" stroke-width="2" fill="none" opacity="0.8">
+                                <animate attributeName="d" values="M25 29 Q15 40, 25 51;M25 29 Q35 40, 25 51;M25 29 Q15 40, 25 51" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+                            </path>
+                            <circle cx="40" cy="40" r="8" fill="none" stroke="#000" stroke-width="2" opacity="0.7"/>
+                            <line x1="40" y1="40" x2="40" y2="32" stroke="#000" stroke-width="2" opacity="0.9">
+                                <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="4s" repeatCount="indefinite"/>
+                            </line>
+                        </svg>
                     </div>
                     <div class="social-info">
                         <div class="social-name">VCV Rack Modules</div>
@@ -446,10 +652,196 @@
                     </div>
                 </div>
             </a>
+
+            <!-- CyberFlow Card -->
+            <a href="https://hutara.github.io/CyberFlow/" target="_blank" class="social-card cyberflow">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Neural Network -->
+                            <g opacity="0.9">
+                                <!-- Input Layer -->
+                                <circle cx="20" cy="20" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="20" cy="40" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="20" cy="60" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.4s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Hidden Layer -->
+                                <circle cx="40" cy="25" r="4" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="40" cy="40" r="4" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="0.8s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="40" cy="55" r="4" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Output Layer -->
+                                <circle cx="60" cy="30" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1.2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="60" cy="50" r="3" fill="#000">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" begin="1.4s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Connections -->
+                                <path d="M23 20 L37 25 M23 20 L37 40 M23 20 L37 55" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M23 40 L37 25 M23 40 L37 40 M23 40 L37 55" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M23 60 L37 25 M23 60 L37 40 M23 60 L37 55" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="1s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M43 25 L57 30 M43 25 L57 50" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+                                </path>
+                                <path d="M43 40 L57 30 M43 40 L57 50" stroke="#000" stroke-width="0.5" opacity="0.5">
+                                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" begin="2s" repeatCount="indefinite"/>
+                                </path>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">CyberFlow</div>
+                        <div class="social-username">Neural Music Generator</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Shader Matrix Card - NEW -->
+            <a href="https://hutara.github.io/ShaderMatrix/" target="_blank" class="social-card shader-matrix">
+                <div class="card-content">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Fragment Shader Visualization -->
+                            <defs>
+                                <linearGradient id="shaderGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#ff0080;#00ff80;#0080ff;#ff0080" dur="4s" repeatCount="indefinite"/>
+                                    </stop>
+                                    <stop offset="100%" style="stop-color:#0080ff;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#0080ff;#ff0080;#00ff80;#0080ff" dur="4s" repeatCount="indefinite"/>
+                                    </stop>
+                                </linearGradient>
+                                <linearGradient id="shaderGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#00ff80;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#00ff80;#0080ff;#ff0080;#00ff80" dur="3s" repeatCount="indefinite"/>
+                                    </stop>
+                                    <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:1">
+                                        <animate attributeName="stop-color" values="#ff00ff;#00ffff;#ffff00;#ff00ff" dur="3s" repeatCount="indefinite"/>
+                                    </stop>
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Pixel Grid -->
+                            <g opacity="0.3">
+                                <rect x="15" y="15" width="50" height="50" fill="none" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="25" x2="65" y2="25" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="35" x2="65" y2="35" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="45" x2="65" y2="45" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="15" y1="55" x2="65" y2="55" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="25" y1="15" x2="25" y2="65" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="35" y1="15" x2="35" y2="65" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="45" y1="15" x2="45" y2="65" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="55" y1="15" x2="55" y2="65" stroke="#fff" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- Animated Triangles (Fragment Shader Effect) -->
+                            <polygon points="40,20 25,45 55,45" fill="url(#shaderGrad1)" opacity="0.7">
+                                <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="8s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+                            </polygon>
+                            
+                            <polygon points="40,60 25,35 55,35" fill="url(#shaderGrad2)" opacity="0.5">
+                                <animateTransform attributeName="transform" type="rotate" from="360 40 40" to="0 40 40" dur="6s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </polygon>
+                            
+                            <!-- UV Coordinates Display -->
+                            <text x="17" y="23" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">0,0</text>
+                            <text x="53" y="23" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">1,0</text>
+                            <text x="17" y="63" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">0,1</text>
+                            <text x="53" y="63" font-family="monospace" font-size="6" fill="#fff" opacity="0.6">1,1</text>
+                            
+                            <!-- Center Point (Fragment) -->
+                            <circle cx="40" cy="40" r="2" fill="#fff">
+                                <animate attributeName="r" values="2;4;2" dur="1.5s" repeatCount="indefinite"/>
+                                <animate attributeName="fill" values="#fff;#ff0080;#0080ff;#fff" dur="3s" repeatCount="indefinite"/>
+                            </circle>
+                            
+                            <!-- Raymarching Effect Lines -->
+                            <line x1="40" y1="40" x2="65" y2="15" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="40" y1="40" x2="15" y2="15" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="40" y1="40" x2="15" y2="65" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="40" y1="40" x2="65" y2="65" stroke="#fff" stroke-width="1" opacity="0.4">
+                                <animate attributeName="opacity" values="0;0.8;0" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+                            </line>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <div class="social-name">Shader Matrix</div>
+                        <div class="social-username">WebGL Shader Editor</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- CyberSynth Card -->            
             <a href="https://hutara.github.io/CyberSynth/" target="_blank" class="social-card cybersynth">
                 <div class="card-content">
                     <div class="social-icon">
-                        <i class="fas fa-wave-square"></i>
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Waveform Visualization -->
+                            <g opacity="0.9">
+                                <path d="M10 40 Q20 20, 30 40 T50 40 Q60 60, 70 40" 
+                                      stroke="#fff" stroke-width="2" fill="none">
+                                    <animate attributeName="d" 
+                                             values="M10 40 Q20 20, 30 40 T50 40 Q60 60, 70 40;
+                                                     M10 40 Q20 60, 30 40 T50 40 Q60 20, 70 40;
+                                                     M10 40 Q20 20, 30 40 T50 40 Q60 60, 70 40" 
+                                             dur="2s" repeatCount="indefinite"/>
+                                </path>
+                                
+                                <!-- Frequency Bars -->
+                                <rect x="15" y="35" width="3" height="10" fill="#fff">
+                                    <animate attributeName="height" values="10;25;10" dur="0.5s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="35;27.5;35" dur="0.5s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="25" y="30" width="3" height="20" fill="#fff">
+                                    <animate attributeName="height" values="20;35;20" dur="0.5s" begin="0.1s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="30;22.5;30" dur="0.5s" begin="0.1s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="35" y="32" width="3" height="16" fill="#fff">
+                                    <animate attributeName="height" values="16;30;16" dur="0.5s" begin="0.2s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="32;25;32" dur="0.5s" begin="0.2s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="45" y="28" width="3" height="24" fill="#fff">
+                                    <animate attributeName="height" values="24;40;24" dur="0.5s" begin="0.3s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="28;20;28" dur="0.5s" begin="0.3s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="55" y="33" width="3" height="14" fill="#fff">
+                                    <animate attributeName="height" values="14;28;14" dur="0.5s" begin="0.4s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="33;26;33" dur="0.5s" begin="0.4s" repeatCount="indefinite"/>
+                                </rect>
+                                <rect x="65" y="36" width="3" height="8" fill="#fff">
+                                    <animate attributeName="height" values="8;20;8" dur="0.5s" begin="0.5s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="36;30;36" dur="0.5s" begin="0.5s" repeatCount="indefinite"/>
+                                </rect>
+                            </g>
+                        </svg>
                     </div>
                     <div class="social-info">
                         <div class="social-name">Strudel CyberSynth</div>
@@ -457,10 +849,43 @@
                     </div>
                 </div>
             </a>
+
+            <!-- Psyber Card -->
             <a href="https://github.com/Remote-Stream/psyber" target="_blank" class="social-card psyber">
                 <div class="card-content">
                     <div class="social-icon">
-                        <i class="fas fa-code"></i>
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Code Terminal -->
+                            <rect x="10" y="15" width="60" height="50" rx="3" fill="none" stroke="#fff" stroke-width="2" opacity="0.7"/>
+                            
+                            <!-- Terminal Header -->
+                            <circle cx="18" cy="23" r="2" fill="#ff6666" opacity="0.9"/>
+                            <circle cx="26" cy="23" r="2" fill="#ffff66" opacity="0.9"/>
+                            <circle cx="34" cy="23" r="2" fill="#66ff66" opacity="0.9"/>
+                            
+                            <!-- Code Lines -->
+                            <text x="15" y="38" font-family="monospace" font-size="8" fill="#fff" opacity="0.9">
+                                <tspan>></tspan>
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                            </text>
+                            <rect x="25" y="33" width="30" height="1" fill="#fff" opacity="0.7">
+                                <animate attributeName="width" values="0;30;0" dur="2s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect x="15" y="43" width="20" height="1" fill="#fff" opacity="0.5">
+                                <animate attributeName="width" values="0;20;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect x="38" y="43" width="15" height="1" fill="#fff" opacity="0.5">
+                                <animate attributeName="width" values="0;15;0" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+                            </rect>
+                            <rect x="15" y="53" width="40" height="1" fill="#fff" opacity="0.6">
+                                <animate attributeName="width" values="0;40;0" dur="2s" begin="1s" repeatCount="indefinite"/>
+                            </rect>
+                            
+                            <!-- Cursor -->
+                            <rect x="56" y="32" width="2" height="8" fill="#fff">
+                                <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+                            </rect>
+                        </svg>
                     </div>
                     <div class="social-info">
                         <div class="social-name">Psyber (Fork of Dilber)</div>
@@ -468,10 +893,58 @@
                     </div>
                 </div>
             </a>
+
+            <!-- Orca Card -->
             <a href="https://hutara.github.io/Orca/" target="_blank" class="social-card orca">
                 <div class="card-content">
                     <div class="social-icon">
-                        <i class="fas fa-terminal"></i>
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Grid Pattern -->
+                            <g opacity="0.3">
+                                <line x1="20" y1="10" x2="20" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="30" y1="10" x2="30" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="40" y1="10" x2="40" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="50" y1="10" x2="50" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="60" y1="10" x2="60" y2="70" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="20" x2="70" y2="20" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="30" x2="70" y2="30" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="40" x2="70" y2="40" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="50" x2="70" y2="50" stroke="#fff" stroke-width="0.5"/>
+                                <line x1="10" y1="60" x2="70" y2="60" stroke="#fff" stroke-width="0.5"/>
+                            </g>
+                            
+                            <!-- Orca Characters -->
+                            <text x="20" y="27" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                D
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="30" y="37" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                8
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="40" y="27" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                T
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="50" y="47" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                C
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.6s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="30" y="57" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                *
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.8s" repeatCount="indefinite"/>
+                            </text>
+                            <text x="50" y="37" font-family="monospace" font-size="10" fill="#fff" font-weight="bold">
+                                :
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="1s" repeatCount="indefinite"/>
+                            </text>
+                            
+                            <!-- Moving Cursor -->
+                            <rect x="18" y="22" width="14" height="12" fill="none" stroke="#fff" stroke-width="2" opacity="0.8">
+                                <animate attributeName="x" values="18;28;38;48;38;28;18" dur="3s" repeatCount="indefinite"/>
+                                <animate attributeName="y" values="22;32;22;42;52;32;22" dur="3s" repeatCount="indefinite"/>
+                            </rect>
+                        </svg>
                     </div>
                     <div class="social-info">
                         <div class="social-name">Orca Hutara</div>
@@ -479,10 +952,35 @@
                     </div>
                 </div>
             </a>
+
+            <!-- Spotify Card -->
             <a href="https://open.spotify.com/artist/7pgFsokJGs8EwXOxXNN6g5" target="_blank" class="social-card spotify">
                 <div class="card-content">
                     <div class="social-icon">
-                        <i class="fab fa-spotify"></i>
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Spotify Wave -->
+                            <circle cx="40" cy="40" r="30" fill="none" stroke="#fff" stroke-width="2" opacity="0.3"/>
+                            
+                            <!-- Sound Waves -->
+                            <path d="M25 35 Q40 30, 55 35" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none">
+                                <animate attributeName="d" values="M25 35 Q40 30, 55 35;M25 35 Q40 40, 55 35;M25 35 Q40 30, 55 35" dur="1.5s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M28 42 Q40 38, 52 42" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none">
+                                <animate attributeName="d" values="M28 42 Q40 38, 52 42;M28 42 Q40 46, 52 42;M28 42 Q40 38, 52 42" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M31 49 Q40 46, 49 49" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none">
+                                <animate attributeName="d" values="M31 49 Q40 46, 49 49;M31 49 Q40 52, 49 49;M31 49 Q40 46, 49 49" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+                            </path>
+                            
+                            <!-- Pulse Effect -->
+                            <circle cx="40" cy="40" r="25" fill="none" stroke="#fff" stroke-width="1" opacity="0">
+                                <animate attributeName="r" values="25;35;25" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0;0.5;0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
                     </div>
                     <div class="social-info">
                         <div class="social-name">Ayahuasca Album</div>
@@ -490,16 +988,98 @@
                     </div>
                 </div>
             </a>
+            <!-- فقط برای صرفه‌جویی در فضا، فقط یکی رو گذاشتم، بقیه رو کپی کنید -->
+
         </div>
         <footer class="footer">
             <div class="footer-text">
                 <span>Made with</span>
-                <span class="pulse">💚</span>
+                <span class="pulse">Heart</span>
                 <span>in The Matrix</span>
             </div>
         </footer>
     </div>
+
     <script>
+        // === INTRO MATRIX RAIN ===
+        const introMatrix = (() => {
+            const canvas = document.getElementById('intro-matrix');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            const cols = Math.floor(w / 20) + 1;
+            const chars = '01アイウエオカキクケコサシスセソ⸸タチツテトナニヌネ⛥ノハヒフヘホマミムメモヤユヨラリルレロワヲン⛧⸸⛥';
+            const drops = [];
+
+            for (let i = 0; i < cols; i++) {
+                drops[i] = Math.random() * -100;
+            }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#0aff0a';
+                ctx.font = '15px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    const x = i * 20;
+                    const y = drops[i] * 20;
+
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#0aff0a';
+                    ctx.fillText(text, x, y);
+                    ctx.shadowBlur = 0;
+
+                    if (y > h && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+
+            return { draw, resize };
+        })();
+
+        // === INTRO ANIMATION CONTROL ===
+        window.addEventListener('load', () => {
+            const overlay = document.getElementById('intro-overlay');
+            const introInterval = setInterval(introMatrix.draw, 50);
+            window.addEventListener('resize', introMatrix.resize);
+
+            setTimeout(() => {
+                overlay.classList.add('fade-out');
+                clearInterval(introInterval);
+            }, 3500);
+
+            overlay.addEventListener('transitionend', () => {
+                overlay.remove();
+                document.body.style.overflow = 'auto';
+            });
+
+            // شروع تایپ‌رایتر عنوان
+            setTimeout(() => {
+                const title = document.querySelector('.glitch-title');
+                const originalText = title.textContent;
+                title.textContent = '';
+                let charIndex = 0;
+                function typeWriter() {
+                    if (charIndex < originalText.length) {
+                        title.textContent += originalText.charAt(charIndex);
+                        charIndex++;
+                        setTimeout(typeWriter, 100);
+                    }
+                }
+                typeWriter();
+            }, 3800);
+        });
+
+        // === MAIN MATRIX BACKGROUND ===
         const MatrixBackground = (() => {
             const config = {
                 matrixColor: '#0aff0a',
@@ -592,52 +1172,25 @@
                 init: function() {
                     window.addEventListener('resize', handleResize);
                     setInterval(draw, config.animationSpeed);
-                },
-                updateConfig: function(newConfig) {
-                    Object.assign(config, newConfig);
-                },
-                getConfig: function() {
-                    return {...config};
                 }
             };
         })();
         MatrixBackground.init();
-        const title = document.querySelector('.glitch-title');
-        const originalText = title.textContent;
-        title.textContent = '';
-        let charIndex = 0;
-        function typeWriter() {
-            if (charIndex < originalText.length) {
-                title.textContent += originalText.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeWriter, 100);
-            }
-        }
-        window.addEventListener('load', () => {
-            setTimeout(typeWriter, 500);
-        });
-        const cards = document.querySelectorAll('.social-card');
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-            });
-        });
-        const statusText = document.querySelector('.status span:last-child');
-        const statuses = [
-            'Psyber',
-            'VCV Modules',
-            'CyberSynth',
-            'Orca',
-            'Ayahuasca'
-        ];
-        let statusIndex = 0;
-        setInterval(() => {
-            statusIndex = (statusIndex + 1) % statuses.length;
-            statusText.style.opacity = '0';
-            setTimeout(() => {
-                statusText.textContent = statuses[statusIndex];
-                statusText.style.opacity = '1';
-            }, 300);
-        }, 5000);
+
+        // === STATUS TEXT CYCLE ===
+        setTimeout(() => {
+            const statusText = document.querySelector('.status span:last-child');
+            const statuses = ['Psyber', 'VCV Modules', 'CyberSynth', 'Shader Matrix', 'Orca', 'Ayahuasca', 'CyberFlow'];
+            let statusIndex = 0;
+            setInterval(() => {
+                statusIndex = (statusIndex + 1) % statuses.length;
+                statusText.style.opacity = '0';
+                setTimeout(() => {
+                    statusText.textContent = statuses[statusIndex];
+                    statusText.style.opacity = '1';
+                }, 300);
+            }, 5000);
+        }, 4600);
     </script>
 </body>
 </html>
